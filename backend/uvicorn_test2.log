@@ -1,0 +1,212 @@
+INFO:     Started server process [33680]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8001 (Press CTRL+C to quit)
+EOF marker not found
+INFO:     127.0.0.1:60260 - "POST /ingest/pdf HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\starlette\applications.py", line 107, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\starlette\middleware\cors.py", line 87, in __call__
+    await self.app(scope, receive, send)
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\starlette\routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\starlette\routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\starlette\routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\starlette\routing.py", line 78, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\starlette\routing.py", line 75, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\app\main.py", line 174, in ingest_pdf
+    pages = extract_pdf_text(pdf_bytes)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\app\rag.py", line 24, in extract_pdf_text
+    reader = PdfReader(BytesIO(pdf_bytes))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\pypdf\_reader.py", line 135, in __init__
+    self._initialize_stream(stream)
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\pypdf\_reader.py", line 156, in _initialize_stream
+    self.read(stream)
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\pypdf\_reader.py", line 578, in read
+    self._find_eof_marker(stream)
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\pypdf\_reader.py", line 686, in _find_eof_marker
+    line = read_previous_line(stream)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\pypdf\_utils.py", line 294, in read_previous_line
+    raise PdfStreamError(STREAM_TRUNCATED_PREMATURELY)
+pypdf.errors.PdfStreamError: Stream has ended unexpectedly
+Exception while exporting Span.
+Traceback (most recent call last):
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\urllib3\connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\urllib3\util\connection.py", line 60, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python311\Lib\socket.py", line 962, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\urllib3\connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\urllib3\connectionpool.py", line 493, in _make_request
+    conn.request(
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\urllib3\connection.py", line 500, in request
+    self.endheaders()
+  File "C:\Program Files\Python311\Lib\http\client.py", line 1298, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "C:\Program Files\Python311\Lib\http\client.py", line 1058, in _send_output
+    self.send(msg)
+  File "C:\Program Files\Python311\Lib\http\client.py", line 996, in send
+    self.connect()
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\urllib3\connection.py", line 331, in connect
+    self.sock = self._new_conn()
+                ^^^^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\urllib3\connection.py", line 211, in _new_conn
+    raise NameResolutionError(self.host, self, e) from e
+urllib3.exceptions.NameResolutionError: HTTPConnection(host='langfuse-web', port=3000): Failed to resolve 'langfuse-web' ([Errno 11001] getaddrinfo failed)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\requests\adapters.py", line 667, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\urllib3\connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\urllib3\util\retry.py", line 535, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='langfuse-web', port=3000): Max retries exceeded with url: /api/public/otel/v1/traces (Caused by NameResolutionError("HTTPConnection(host='langfuse-web', port=3000): Failed to resolve 'langfuse-web' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\opentelemetry\exporter\otlp\proto\http\trace_exporter\__init__.py", line 157, in _export
+    resp = self._session.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\requests\sessions.py", line 637, in post
+    return self.request("POST", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\requests\sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\requests\sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\requests\adapters.py", line 700, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPConnectionPool(host='langfuse-web', port=3000): Max retries exceeded with url: /api/public/otel/v1/traces (Caused by NameResolutionError("HTTPConnection(host='langfuse-web', port=3000): Failed to resolve 'langfuse-web' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\urllib3\connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\urllib3\util\connection.py", line 60, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python311\Lib\socket.py", line 962, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\urllib3\connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\urllib3\connectionpool.py", line 493, in _make_request
+    conn.request(
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\urllib3\connection.py", line 500, in request
+    self.endheaders()
+  File "C:\Program Files\Python311\Lib\http\client.py", line 1298, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "C:\Program Files\Python311\Lib\http\client.py", line 1058, in _send_output
+    self.send(msg)
+  File "C:\Program Files\Python311\Lib\http\client.py", line 996, in send
+    self.connect()
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\urllib3\connection.py", line 331, in connect
+    self.sock = self._new_conn()
+                ^^^^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\urllib3\connection.py", line 211, in _new_conn
+    raise NameResolutionError(self.host, self, e) from e
+urllib3.exceptions.NameResolutionError: HTTPConnection(host='langfuse-web', port=3000): Failed to resolve 'langfuse-web' ([Errno 11001] getaddrinfo failed)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\requests\adapters.py", line 667, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\urllib3\connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\urllib3\util\retry.py", line 535, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='langfuse-web', port=3000): Max retries exceeded with url: /api/public/otel/v1/traces (Caused by NameResolutionError("HTTPConnection(host='langfuse-web', port=3000): Failed to resolve 'langfuse-web' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\opentelemetry\sdk\_shared_internal\__init__.py", line 179, in _export
+    self._exporter.export(
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\opentelemetry\exporter\otlp\proto\http\trace_exporter\__init__.py", line 182, in export
+    resp = self._export(serialized_data, deadline_sec - time())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\opentelemetry\exporter\otlp\proto\http\trace_exporter\__init__.py", line 165, in _export
+    resp = self._session.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\requests\sessions.py", line 637, in post
+    return self.request("POST", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\requests\sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\requests\sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\DesenvolvimentoDeepDiveIA\POCS\interview\chat\backend\venv\Lib\site-packages\requests\adapters.py", line 700, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPConnectionPool(host='langfuse-web', port=3000): Max retries exceeded with url: /api/public/otel/v1/traces (Caused by NameResolutionError("HTTPConnection(host='langfuse-web', port=3000): Failed to resolve 'langfuse-web' ([Errno 11001] getaddrinfo failed)"))
