@@ -3,7 +3,12 @@ from __future__ import annotations
 from contextlib import contextmanager
 from typing import Any, Iterator
 
-from langfuse import Langfuse
+try:
+    from langfuse import Langfuse
+except Exception as e:
+    Langfuse = None
+    import logging
+    logging.warning(f"Failed to import Langfuse: {e}. Tracing will be disabled.")
 
 from .config import Settings
 
@@ -15,9 +20,10 @@ class LangfuseHelper:
             and settings.langfuse_public_key
             and settings.langfuse_secret_key
             and settings.langfuse_base_url
+            and Langfuse is not None
         )
-        self._client: Langfuse | None = None
-        if self._enabled:
+        self._client: Any | None = None
+        if self._enabled and Langfuse:
             self._client = Langfuse(
                 public_key=settings.langfuse_public_key,
                 secret_key=settings.langfuse_secret_key,
@@ -29,7 +35,7 @@ class LangfuseHelper:
         return self._enabled
 
     @property
-    def client(self) -> Langfuse | None:
+    def client(self) -> Any | None:
         return self._client
 
     @contextmanager

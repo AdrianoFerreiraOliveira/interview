@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DeepDiveIA - Enterprise RAG Platform</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#2563EB", // Bright blue from DeepGPT button and DeepDiveIA logo
+              "primary-dark": "#1E3A8A", // Deep blue mentioned in prompt
+              "background-light": "#F3F6FC", // Very light blueish gray
+              "background-dark": "#0f172a", // Slate 900
+              "surface-light": "#FFFFFF",
+              "surface-dark": "#1e293b", // Slate 800
+              "accent-blue": "#eff6ff", // Blue 50
+              "border-light": "#E2E8F0",
+              "border-dark": "#334155",
+            },
+            fontFamily: {
+              display: ["Inter", "sans-serif"],
+              sans: ["Inter", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+              'xl': '0.75rem',
+              '2xl': '1rem',
+            },
+            boxShadow: {
+                'subtle': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
+            }
+          },
+        },
+      };
+    </script>
+<style>::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }.glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .dark .glass {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 font-sans h-screen flex overflow-hidden selection:bg-primary selection:text-white transition-colors duration-200">
+<aside class="w-64 bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark flex flex-col flex-shrink-0 z-20">
+<div class="h-16 flex items-center px-6 border-b border-border-light dark:border-border-dark">
+<div class="flex items-center gap-2">
+<div class="bg-primary text-white p-1 rounded-lg">
+<span class="material-symbols-outlined text-xl">psychology</span>
+</div>
+<div class="font-bold text-lg tracking-tight text-primary-dark dark:text-white">DeepDiveIA</div>
+</div>
+</div>
+<div class="p-4">
+<button class="w-full bg-primary hover:bg-blue-600 text-white font-medium py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-subtle hover:shadow-md">
+<span class="material-icons text-sm">add</span>
+<span>Novo Chat</span>
+</button>
+</div>
+<nav class="flex-1 overflow-y-auto px-3 py-2 space-y-1">
+<div class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider px-3 mb-2 mt-2">Plataforma</div>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors text-[20px]">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors text-[20px]">smart_toy</span>
+<span class="text-sm font-medium">Assistentes</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-blue-50 dark:bg-blue-900/20 text-primary dark:text-blue-300 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined text-primary dark:text-blue-300 transition-colors text-[20px]">chat</span>
+<span class="text-sm font-medium">Conversas</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors text-[20px]">folder_open</span>
+<span class="text-sm font-medium">Documentos</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors text-[20px]">monitoring</span>
+<span class="text-sm font-medium">Monitoramento</span>
+</a>
+<div class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider px-3 mb-2 mt-6">Compliance</div>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors text-[20px]">verified_user</span>
+<span class="text-sm font-medium">Auditoria</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors text-[20px]">policy</span>
+<span class="text-sm font-medium">Regras de IA</span>
+</a>
+</nav>
+<div class="p-4 border-t border-border-light dark:border-border-dark">
+<button class="flex items-center gap-3 w-full hover:bg-slate-100 dark:hover:bg-slate-700/50 p-2 rounded-lg transition-colors">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-medium text-xs">
+                    AF
+                </div>
+<div class="flex-1 text-left overflow-hidden">
+<p class="text-sm font-medium text-slate-700 dark:text-slate-200 truncate">Adriano Ferreira</p>
+<p class="text-xs text-slate-500 dark:text-slate-400 truncate">adriano.ferreira@deepdive.ia</p>
+</div>
+<span class="material-icons text-slate-400 text-sm">more_vert</span>
+</button>
+<button class="mt-2 w-full flex items-center gap-2 text-slate-500 hover:text-red-500 dark:text-slate-400 dark:hover:text-red-400 px-2 py-1 text-xs transition-colors">
+<span class="material-icons text-sm">logout</span>
+                Sair do sistema
+            </button>
+</div>
+</aside>
+<main class="flex-1 flex flex-col h-full relative min-w-0 bg-white dark:bg-background-dark">
+<header class="h-16 border-b border-border-light dark:border-border-dark flex items-center justify-between px-6 bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-md sticky top-0 z-10">
+<div class="flex items-center gap-4">
+<div>
+<h1 class="text-sm font-semibold text-slate-800 dark:text-white">Q3 Financial Analysis</h1>
+<p class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                        Online • RAG v2.1
+                    </p>
+</div>
+<div class="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-2"></div>
+<div class="relative group">
+<button class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-1.5 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 transition-colors border border-transparent hover:border-slate-300 dark:hover:border-slate-600">
+<span class="material-symbols-outlined text-[18px]">neurology</span>
+<span>GPT-4o Enterprise</span>
+<span class="material-icons text-sm text-slate-400">expand_more</span>
+</button>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors relative" title="Notifications">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-background-dark"></span>
+</button>
+<button class="flex items-center gap-2 text-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border border-blue-100 dark:border-blue-900">
+<span class="material-symbols-outlined text-[18px]">view_sidebar</span>
+<span>Mostrar canvas</span>
+</button>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 scroll-smooth" id="chat-container">
+<div class="flex justify-end w-full">
+<div class="flex flex-row-reverse max-w-3xl gap-4">
+<div class="w-8 h-8 rounded-full bg-primary flex-shrink-0 flex items-center justify-center text-white text-xs font-bold mt-1">AF</div>
+<div class="space-y-1">
+<div class="bg-primary text-white p-4 rounded-2xl rounded-tr-sm shadow-sm text-[15px] leading-relaxed">
+<p>Qual foi o impacto da adoção de containers Kubernetes nos custos de infraestrutura no Q3, comparado com o Q2? Por favor, cite as fontes dos relatórios financeiros internos.</p>
+</div>
+<div class="text-xs text-slate-400 text-right pr-1">14:23</div>
+</div>
+</div>
+</div>
+<div class="flex justify-start w-full">
+<div class="flex max-w-4xl gap-4">
+<div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 flex-shrink-0 flex items-center justify-center text-white mt-1 shadow-md">
+<span class="material-symbols-outlined text-[16px]">smart_toy</span>
+</div>
+<div class="space-y-4 flex-1">
+<div class="bg-white dark:bg-surface-dark border border-slate-100 dark:border-slate-700 p-6 rounded-2xl rounded-tl-sm shadow-sm text-[15px] leading-relaxed text-slate-700 dark:text-slate-300">
+<div class="flex items-center gap-2 mb-4">
+<span class="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-green-200 dark:border-green-800 flex items-center gap-1">
+<span class="material-icons text-[10px]">check_circle</span>
+                                    Alta Confiança (94%)
+                                </span>
+<span class="text-xs text-slate-400">•</span>
+<span class="text-xs text-slate-400">Processado em 1.2s</span>
+</div>
+<p class="mb-3">Com base nos relatórios financeiros internos, a migração para Kubernetes resultou em uma <strong>redução de 22% nos custos gerais de infraestrutura</strong> no Q3 em comparação com o Q2.</p>
+<p class="mb-3">Os principais fatores contribuíram para essa economia:</p>
+<ul class="list-disc pl-5 space-y-1 mb-4 text-slate-600 dark:text-slate-400">
+<li><strong>Otimização de Recursos:</strong> O "bin-packing" mais eficiente permitiu desativar 15 instâncias EC2 de grande porte <span class="inline-flex items-center justify-center w-4 h-4 text-[10px] bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full cursor-help" title="Fonte 1">[1]</span>.</li>
+<li><strong>Spot Instances:</strong> A arquitetura resiliente permitiu o uso de 60% de instâncias spot para ambientes de não-produção <span class="inline-flex items-center justify-center w-4 h-4 text-[10px] bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full cursor-help" title="Fonte 2">[2]</span>.</li>
+<li><strong>Redução de Licenças:</strong> Consolidação de ferramentas de monitoramento legadas <span class="inline-flex items-center justify-center w-4 h-4 text-[10px] bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full cursor-help" title="Fonte 1">[1]</span>.</li>
+</ul>
+<p>No entanto, houve um aumento pontual de 5% em custos de treinamento da equipe DevOps durante o mês de Julho, que foi absorvido pela economia operacional já em Agosto.</p>
+</div>
+<div class="glass rounded-xl p-4 border border-blue-100 dark:border-slate-700 shadow-sm">
+<h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-2">
+<span class="material-icons text-sm">library_books</span>
+                                Fontes Recuperadas (RAG)
+                            </h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+<a class="group block p-3 bg-white dark:bg-surface-dark rounded-lg border border-slate-200 dark:border-slate-700 hover:border-primary/50 dark:hover:border-primary/50 transition-all hover:shadow-md" href="#">
+<div class="flex items-start gap-3">
+<div class="bg-red-50 dark:bg-red-900/20 p-1.5 rounded text-red-600 dark:text-red-400">
+<span class="material-icons text-sm">picture_as_pdf</span>
+</div>
+<div>
+<div class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-primary transition-colors">Relatório_Infra_Q3_2023.pdf</div>
+<div class="text-xs text-slate-500 mt-1">Página 14 • Seção "Cloud Optimization"</div>
+<div class="mt-2 text-[11px] bg-slate-50 dark:bg-slate-800 p-1.5 rounded text-slate-600 dark:text-slate-400 line-clamp-2">
+                                                "...desativação de 15 instâncias EC2 large resultou em saving imediato..."
+                                            </div>
+</div>
+</div>
+</a>
+<a class="group block p-3 bg-white dark:bg-surface-dark rounded-lg border border-slate-200 dark:border-slate-700 hover:border-primary/50 dark:hover:border-primary/50 transition-all hover:shadow-md" href="#">
+<div class="flex items-start gap-3">
+<div class="bg-green-50 dark:bg-green-900/20 p-1.5 rounded text-green-600 dark:text-green-400">
+<span class="material-icons text-sm">table_view</span>
+</div>
+<div>
+<div class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-primary transition-colors">Budget_vs_Actual_2023.xlsx</div>
+<div class="text-xs text-slate-500 mt-1">Tab "Spot Usage" • Linha 45-52</div>
+<div class="mt-2 text-[11px] bg-slate-50 dark:bg-slate-800 p-1.5 rounded text-slate-600 dark:text-slate-400 line-clamp-2">
+                                                "...adoção de Spot Instances atingiu 60% em dev/homol..."
+                                            </div>
+</div>
+</div>
+</a>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 dark:text-slate-400 text-xs font-medium transition-colors">
+<span class="material-icons text-sm">content_copy</span>
+                                Copiar
+                            </button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 dark:text-slate-400 text-xs font-medium transition-colors">
+<span class="material-icons text-sm">thumb_up</span>
+                                Útil
+                            </button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 dark:text-slate-400 text-xs font-medium transition-colors">
+<span class="material-icons text-sm">thumb_down</span>
+                                Não útil
+                            </button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 dark:text-slate-400 text-xs font-medium transition-colors ml-auto">
+<span class="material-icons text-sm">autorenew</span>
+                                Regenerar
+                            </button>
+</div>
+</div>
+</div>
+</div>
+<div class="h-12"></div>
+</div>
+<div class="p-6 pt-2 bg-gradient-to-t from-white via-white to-transparent dark:from-background-dark dark:via-background-dark z-10">
+<div class="max-w-4xl mx-auto">
+<div class="bg-white dark:bg-surface-dark border border-slate-200 dark:border-slate-600 shadow-lg rounded-2xl p-2 transition-shadow focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary">
+<textarea class="w-full resize-none border-none bg-transparent px-4 py-3 text-slate-700 dark:text-slate-200 placeholder-slate-400 focus:ring-0 text-[15px] max-h-48" placeholder="Digite sua mensagem para pesquisar na base de conhecimento..." rows="1" style="min-height: 52px;"></textarea>
+<div class="flex items-center justify-between px-2 pb-1">
+<div class="flex items-center gap-1">
+<button class="p-2 text-slate-400 hover:text-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full transition-colors" title="Adicionar arquivo">
+<span class="material-icons text-[20px]">add_circle_outline</span>
+</button>
+<button class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors" title="Gravar áudio">
+<span class="material-symbols-outlined text-[20px]">mic</span>
+</button>
+<div class="h-4 w-px bg-slate-200 dark:bg-slate-600 mx-1"></div>
+<button class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors" title="Deep Prompt">
+<span class="material-symbols-outlined text-[20px]">auto_awesome</span>
+</button>
+</div>
+<div class="flex items-center gap-3">
+<div class="text-xs text-slate-400 hidden sm:block">
+                                Pressione <strong>Enter</strong> para enviar
+                            </div>
+<button class="bg-primary hover:bg-blue-600 text-white p-2.5 rounded-xl shadow-md transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
+<span class="material-icons text-[18px]">send</span>
+</button>
+</div>
+</div>
+</div>
+<div class="text-center mt-2">
+<p class="text-[11px] text-slate-400 dark:text-slate-500">
+                        DeepDiveIA pode cometer erros. Verifique informações importantes. Dados confidenciais protegidos por criptografia E2E.
+                    </p>
+</div>
+</div>
+</div>
+</main>
+<aside class="w-80 bg-surface-light dark:bg-surface-dark border-l border-border-light dark:border-border-dark hidden xl:flex flex-col flex-shrink-0 z-20">
+<div class="flex border-b border-border-light dark:border-border-dark">
+<button class="flex-1 py-3 text-sm font-medium text-primary border-b-2 border-primary bg-blue-50/50 dark:bg-blue-900/10 dark:text-blue-300">
+                Parâmetros
+            </button>
+<button class="flex-1 py-3 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors">
+                Logs de RAG
+            </button>
+</div>
+<div class="flex-1 overflow-y-auto p-5 space-y-6">
+<div>
+<h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Contexto &amp; Dados</h3>
+<div class="space-y-3">
+<div class="border border-border-light dark:border-border-dark rounded-lg p-3 bg-white dark:bg-surface-dark">
+<label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-2">Base de Conhecimento (Vector DB)</label>
+<select class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-md text-sm py-1.5 px-2 focus:ring-1 focus:ring-primary focus:border-primary text-slate-700 dark:text-slate-200">
+<option>Financeiro Global (Q3 2023)</option>
+<option>RH Políticas Internas</option>
+<option>Documentação Técnica</option>
+</select>
+</div>
+<div class="border-dashed border-2 border-slate-200 dark:border-slate-700 rounded-lg p-4 text-center hover:border-primary hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-all cursor-pointer group">
+<span class="material-icons text-slate-400 group-hover:text-primary mb-1 text-2xl">cloud_upload</span>
+<p class="text-xs text-slate-500 dark:text-slate-400">Arraste novos documentos PDF/CSV para adicionar ao contexto</p>
+</div>
+</div>
+</div>
+<hr class="border-slate-200 dark:border-slate-700"/>
+<div>
+<h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Configuração do Modelo</h3>
+<div class="space-y-4">
+<div>
+<div class="flex justify-between mb-1">
+<label class="text-xs font-medium text-slate-700 dark:text-slate-300">Temperatura</label>
+<span class="text-xs text-slate-500">0.2 (Preciso)</span>
+</div>
+<input class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-primary" max="100" min="0" type="range" value="20"/>
+</div>
+<div>
+<div class="flex justify-between mb-1">
+<label class="text-xs font-medium text-slate-700 dark:text-slate-300">Top-K Retrieval</label>
+<span class="text-xs text-slate-500">5 chunks</span>
+</div>
+<input class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-primary" max="10" min="1" type="range" value="5"/>
+</div>
+<div>
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="rounded border-slate-300 text-primary focus:ring-primary w-4 h-4" type="checkbox"/>
+<span class="text-xs text-slate-700 dark:text-slate-300">Citar fontes obrigatórias</span>
+</label>
+</div>
+</div>
+</div>
+<hr class="border-slate-200 dark:border-slate-700"/>
+<div>
+<h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Métricas da Sessão</h3>
+<div class="grid grid-cols-2 gap-3">
+<div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-100 dark:border-slate-700">
+<div class="text-[10px] text-slate-400 uppercase">Latência</div>
+<div class="text-lg font-semibold text-slate-700 dark:text-slate-200">1.2s</div>
+</div>
+<div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-100 dark:border-slate-700">
+<div class="text-[10px] text-slate-400 uppercase">Tokens (Entrada)</div>
+<div class="text-lg font-semibold text-slate-700 dark:text-slate-200">452</div>
+</div>
+<div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-100 dark:border-slate-700">
+<div class="text-[10px] text-slate-400 uppercase">Custo Est.</div>
+<div class="text-lg font-semibold text-slate-700 dark:text-slate-200">$0.003</div>
+</div>
+<div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-100 dark:border-slate-700">
+<div class="text-[10px] text-slate-400 uppercase">Tokens (Saída)</div>
+<div class="text-lg font-semibold text-slate-700 dark:text-slate-200">189</div>
+</div>
+</div>
+</div>
+</div>
+<div class="p-4 border-t border-border-light dark:border-border-dark bg-slate-50 dark:bg-slate-800/50 text-xs">
+<div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
+<span class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    Vector DB Online
+                </span>
+<span>v3.4.0</span>
+</div>
+</div>
+</aside>
+<script>
+        // Simple dark mode toggle for demonstration (normally handled by OS preference or setting)
+        // In a real app, this would be more robust.
+        // For this demo, let's just default to light mode but respect system pref if loaded
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+
+</body></html>

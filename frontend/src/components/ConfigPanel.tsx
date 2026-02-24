@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
-import { Settings, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Settings } from 'lucide-react';
 import { AIConfig } from '@/types/ai';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { ingestPdf, listModels } from '@/lib/ragApi';
@@ -10,6 +10,10 @@ type ConfigPanelProps = {
   config: AIConfig;
   setConfig: Dispatch<SetStateAction<AIConfig>>;
 };
+
+const fieldClass =
+  'w-full rounded-lg border border-input/80 bg-background px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring';
+const sectionClass = 'rounded-xl border border-border/80 bg-card/75 p-3.5 shadow-sm';
 
 const ConfigPanel = ({ config, setConfig }: ConfigPanelProps) => {
   const [collapsed, setCollapsed] = useState(false);
@@ -56,7 +60,7 @@ const ConfigPanel = ({ config, setConfig }: ConfigPanelProps) => {
     return (
       <button
         onClick={() => setCollapsed(false)}
-        className="flex items-center justify-center w-10 h-full border-l border-border bg-card hover:bg-muted/50 transition-colors"
+        className="hidden h-full w-11 items-center justify-center border-l border-border/80 bg-card/85 transition-colors hover:bg-muted/50 lg:flex"
       >
         <div className="flex flex-col items-center gap-2">
           <Settings className="h-4 w-4 text-muted-foreground" />
@@ -67,25 +71,43 @@ const ConfigPanel = ({ config, setConfig }: ConfigPanelProps) => {
   }
 
   return (
-    <div className="w-72 shrink-0 border-l border-border bg-card overflow-y-auto scrollbar-thin">
-      <div className="flex items-center justify-between p-4 border-b border-border">
-        <div className="flex items-center gap-2">
-          <Settings className="h-4 w-4 text-muted-foreground" />
-          <h3 className="text-sm font-semibold text-foreground">Configuration</h3>
+    <aside className="w-full shrink-0 overflow-y-auto border-t border-border/80 bg-card/85 scrollbar-thin backdrop-blur-sm lg:w-[22rem] lg:border-l lg:border-t-0">
+      <div className="sticky top-0 z-10 border-b border-border/80 bg-card/95 p-4 backdrop-blur-sm">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-primary/20 to-secondary/25">
+              <Settings className="h-4 w-4 text-primary" />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-foreground">Centro de Controle</h3>
+              <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">DeepDiveIA</p>
+            </div>
+          </div>
+          <button onClick={() => setCollapsed(true)} className="hidden rounded-lg p-1 transition-colors hover:bg-muted lg:block">
+            <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+          </button>
         </div>
-        <button onClick={() => setCollapsed(true)} className="p-1 rounded hover:bg-muted transition-colors">
-          <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
-        </button>
+        <div className="mt-3 grid grid-cols-2 gap-1 rounded-lg border border-border/70 bg-background/75 p-1 text-xs">
+          <button
+            type="button"
+            className="rounded-md bg-primary px-2 py-1.5 font-semibold text-primary-foreground"
+          >
+            Parametros
+          </button>
+          <button
+            type="button"
+            className="rounded-md px-2 py-1.5 font-medium text-muted-foreground transition-colors hover:bg-muted/50"
+          >
+            Sessao
+          </button>
+        </div>
       </div>
-      <div className="p-4 space-y-5">
-        <div>
-          <div className="flex items-center justify-between mb-1.5">
-            <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider">Model</label>
-            <button
-              onClick={() => refetch()}
-              className="text-[10px] font-medium text-muted-foreground hover:text-foreground"
-              type="button"
-            >
+
+      <div className="space-y-4 p-4">
+        <section className={sectionClass}>
+          <div className="mb-1.5 flex items-center justify-between">
+            <label className="block text-xs font-medium uppercase tracking-wider text-muted-foreground">Modelo de resposta</label>
+            <button onClick={() => refetch()} className="text-[10px] font-semibold text-primary hover:text-primary/80" type="button">
               Atualizar
             </button>
           </div>
@@ -93,7 +115,7 @@ const ConfigPanel = ({ config, setConfig }: ConfigPanelProps) => {
             <select
               value={config.model}
               onChange={e => setConfig(c => ({ ...c, model: e.target.value }))}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+              className={fieldClass}
             >
               {modelOptions.map(m => (
                 <option key={m} value={m}>{m}</option>
@@ -104,7 +126,7 @@ const ConfigPanel = ({ config, setConfig }: ConfigPanelProps) => {
               value={config.model}
               onChange={e => setConfig(c => ({ ...c, model: e.target.value }))}
               placeholder={isLoading ? 'Carregando modelos...' : 'Digite o modelo (ex: llama3.1)'}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+              className={fieldClass}
             />
           )}
           {isError && (
@@ -115,13 +137,14 @@ const ConfigPanel = ({ config, setConfig }: ConfigPanelProps) => {
           {!isError && modelOptions.length === 0 && !isLoading && (
             <p className="mt-1 text-[11px] text-muted-foreground">Nenhum modelo encontrado no Ollama.</p>
           )}
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5">Embedding Model</label>
+        </section>
+
+        <section className={sectionClass}>
+          <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-muted-foreground">Modelo de embedding</label>
           <select
             value={config.embeddingModel ?? ''}
             onChange={e => setConfig(c => ({ ...c, embeddingModel: e.target.value || undefined }))}
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            className={fieldClass}
           >
             <option value="">Usar padrão do backend</option>
             {modelOptions.map(m => (
@@ -129,21 +152,22 @@ const ConfigPanel = ({ config, setConfig }: ConfigPanelProps) => {
             ))}
           </select>
           <p className="mt-1 text-[11px] text-muted-foreground">Selecione um modelo com suporte a embeddings.</p>
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5">Upload de PDF</label>
+        </section>
+
+        <section className={sectionClass}>
+          <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-muted-foreground">Upload de PDF</label>
           <div className="space-y-2">
             <input
               type="file"
               accept="application/pdf"
               onChange={e => setSelectedFile(e.target.files?.[0] || null)}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-xs file:mr-3 file:rounded file:border-0 file:bg-secondary file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-secondary-foreground hover:file:bg-secondary/80"
+              className="w-full rounded-lg border border-dashed border-input/80 bg-background px-3 py-2 text-xs file:mr-3 file:rounded-md file:border-0 file:bg-secondary file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-secondary-foreground hover:file:bg-secondary/80"
             />
             <button
               type="button"
               disabled={!selectedFile || ingestMutation.isPending}
               onClick={() => selectedFile && ingestMutation.mutate(selectedFile)}
-              className="w-full rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+              className="w-full rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
             >
               {ingestMutation.isPending ? 'Enviando...' : 'Enviar e indexar'}
             </button>
@@ -154,13 +178,14 @@ const ConfigPanel = ({ config, setConfig }: ConfigPanelProps) => {
             )}
             {lastUpload && (
               <p className="text-[11px] text-muted-foreground">
-                Último upload: {lastUpload.name} ({lastUpload.chunks} chunks, {lastUpload.embeddingModel})
+                Ultimo upload: {lastUpload.name} ({lastUpload.chunks} chunks, {lastUpload.embeddingModel})
               </p>
             )}
           </div>
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5">
+        </section>
+
+        <section className={sectionClass}>
+          <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-muted-foreground">
             Temperature: {config.temperature.toFixed(2)}
           </label>
           <input
@@ -170,15 +195,16 @@ const ConfigPanel = ({ config, setConfig }: ConfigPanelProps) => {
             step="0.05"
             value={config.temperature}
             onChange={e => setConfig(c => ({ ...c, temperature: parseFloat(e.target.value) }))}
-            className="w-full accent-secondary"
+            className="w-full accent-primary"
           />
-          <div className="flex justify-between text-xs text-muted-foreground mt-0.5">
-            <span>Precise</span>
-            <span>Creative</span>
+          <div className="mt-0.5 flex justify-between text-xs text-muted-foreground">
+            <span>Preciso</span>
+            <span>Criativo</span>
           </div>
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5">
+        </section>
+
+        <section className={sectionClass}>
+          <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-muted-foreground">
             Top K Retrieval: {config.topK}
           </label>
           <input
@@ -187,33 +213,57 @@ const ConfigPanel = ({ config, setConfig }: ConfigPanelProps) => {
             max="20"
             step="1"
             value={config.topK}
-            onChange={e => setConfig(c => ({ ...c, topK: parseInt(e.target.value) }))}
-            className="w-full accent-secondary"
+            onChange={e => setConfig(c => ({ ...c, topK: parseInt(e.target.value, 10) }))}
+            className="w-full accent-primary"
           />
-          <div className="flex justify-between text-xs text-muted-foreground mt-0.5">
+          <div className="mt-0.5 flex justify-between text-xs text-muted-foreground">
             <span>1</span>
             <span>20</span>
           </div>
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5">System Prompt</label>
+        </section>
+
+        <section className={sectionClass}>
+          <p className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">Metricas da sessao</p>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="rounded-lg border border-border/70 bg-background/80 px-2.5 py-2">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Modelo</p>
+              <p className="mt-1 truncate text-xs font-semibold text-foreground">{config.model || '—'}</p>
+            </div>
+            <div className="rounded-lg border border-border/70 bg-background/80 px-2.5 py-2">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Embedding</p>
+              <p className="mt-1 truncate text-xs font-semibold text-foreground">{config.embeddingModel || 'Padrao'}</p>
+            </div>
+            <div className="rounded-lg border border-border/70 bg-background/80 px-2.5 py-2">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Top K</p>
+              <p className="mt-1 text-xs font-semibold text-foreground">{config.topK} chunks</p>
+            </div>
+            <div className="rounded-lg border border-border/70 bg-background/80 px-2.5 py-2">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Ultimo upload</p>
+              <p className="mt-1 truncate text-xs font-semibold text-foreground">{lastUpload ? `${lastUpload.chunks} chunks` : '—'}</p>
+            </div>
+          </div>
+        </section>
+
+        <section className={sectionClass}>
+          <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-muted-foreground">System Prompt</label>
           <textarea
             value={config.systemPrompt}
             onChange={e => setConfig(c => ({ ...c, systemPrompt: e.target.value }))}
             rows={6}
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-xs font-mono leading-relaxed focus:outline-none focus:ring-1 focus:ring-ring resize-none"
+            className="w-full resize-none rounded-lg border border-input/80 bg-background px-3 py-2 text-xs font-mono leading-relaxed focus:outline-none focus:ring-1 focus:ring-ring"
           />
-        </div>
-        <div className="rounded-md bg-muted/50 p-3">
+        </section>
+
+        <section className="rounded-xl border border-primary/20 bg-gradient-to-br from-primary/8 via-background to-secondary/10 p-3.5">
           <p className="text-xs text-muted-foreground">
-            <span className="font-medium text-foreground">Pipeline info</span><br />
+            <span className="font-semibold text-foreground">Pipeline DeepDiveIA</span><br />
             Embeddings: {config.embeddingModel || 'backend default'}<br />
             Vector DB: qdrant<br />
             Re-ranker: none
           </p>
-        </div>
+        </section>
       </div>
-    </div>
+    </aside>
   );
 };
 

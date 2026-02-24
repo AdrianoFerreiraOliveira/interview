@@ -180,17 +180,20 @@ class PromptStore:
             self._write_file(self.config)
         return self.config
 
-    def build_rag_prompt(self, context: str, question: str) -> str:
+    def build_rag_prompt(self, context: str, question: str, chat_history: str = "") -> str:
         """Build the final RAG prompt by combining all relevant prompt sections."""
         template = self.config.rag_prompt_template
         hallucination = self.config.hallucination_guard
         ambiguity = self.config.ambiguity_handler
         fmt = self.config.response_format_instructions
 
+        history_block = f"### Histórico da Conversa\n{chat_history}\n\n" if chat_history else ""
+
         full_prompt = (
             f"{hallucination}\n\n"
             f"{ambiguity}\n\n"
             f"{fmt}\n\n"
+            f"{history_block}"
             f"{template.format(context=context, question=question)}"
         )
         return full_prompt

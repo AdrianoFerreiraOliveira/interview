@@ -16,6 +16,24 @@ from .langfuse_client import LangfuseHelper
 from .ollama_client import OllamaClient
 from .prompt_store import PromptConfig, PromptStore
 from .rag import split_documents, load_document, ingest_documents
+from .minio_client import MinioHelper
+from .supabase_client import SupabaseHelper
+from .redis_helpers import RedisHelpers
+
+_ranker = None
+def get_ranker():
+    global _ranker
+    if _ranker is None:
+        try:
+            from flashrank import Ranker
+            import logging
+            logging.info("Initializing Flashrank Ranker...")
+            _ranker = Ranker()
+        except ImportError:
+            import logging
+            logging.warning("Flashrank not installed, reranking disabled.")
+            _ranker = False
+    return _ranker if _ranker is not False else None
 
 
 settings = get_settings()
@@ -57,6 +75,7 @@ class QueryRequest(BaseModel):
     top_k: int = Field(4, ge=1, le=20)
     embedding_model: str | None = Field(None, description="Ollama model for embeddings")
     temperature: float = Field(0.2, ge=0, le=2)
+    session_id: str | None = Field(None, description="Optional Session ID for chat memory")
 
 class ComplianceInfo(BaseModel):
     is_blocked: bool = False
@@ -76,6 +95,13 @@ class IngestResponse(BaseModel):
     document_name: str
     chunks_indexed: int
     embedding_model: str
+
+
+class DocumentResponse(BaseModel):
+    id: str
+    name: str
+    created_at: str | None = None
+    url: str | None = None
 
 
 class ComplianceCheckRequest(BaseModel):
@@ -219,6 +245,24 @@ async def ingest_document(
             )
         except Exception as exc:
             raise HTTPException(status_code=502, detail=str(exc)) from exc
+            
+    # 1. Upload to MinIO
+    minio = MinioHelper.get()
+    object_key = f"{document_id}_{document_name}"
+    minio.upload_file(file_bytes, object_key, file.content_type or "application/pdf")
+    
+    # 2. Register in Supabase
+    supabase = SupabaseHelper.get()
+    if supabase.client:
+        try:
+            supabase.client.table("documents").insert({
+                "id": document_id,
+                "name": document_name,
+                "object_key": object_key
+            }).execute()
+        except Exception as e:
+            import logging
+            logging.error(f"Failed to register document in Supabase: {e}")
 
     return IngestResponse(
         document_id=document_id,
@@ -226,6 +270,77 @@ async def ingest_document(
         chunks_indexed=indexed,
         embedding_model=embed_model,
     )
+
+@app.get("/documents", response_model=list[DocumentResponse])
+def get_documents() -> list[DocumentResponse]:
+    supabase = SupabaseHelper.get()
+    minio = MinioHelper.get()
+    docs = []
+    
+    if supabase.client:
+        try:
+            response = supabase.client.table("documents").select("*").execute()
+            for row in response.data:
+                doc_url = None
+                if row.get("object_key"):
+                    doc_url = minio.get_presigned_url(row["object_key"])
+                
+                docs.append(DocumentResponse(
+                    id=row["id"],
+                    name=row["name"],
+                    created_at=row.get("created_at"),
+                    url=doc_url
+                ))
+        except Exception as e:
+            import logging
+            logging.error(f"Failed to fetch documents from Supabase: {e}")
+            raise HTTPException(status_code=500, detail="Database fetch error")
+            
+    return docs
+
+@app.delete("/documents/{document_id}")
+def delete_document(document_id: str):
+    supabase = SupabaseHelper.get()
+    minio = MinioHelper.get()
+    
+    # 1. Delete from Supabase and MinIO
+    if supabase.client:
+        try:
+            # Get object details to delete in MinIO
+            response = supabase.client.table("documents").select("object_key").eq("id", document_id).execute()
+            if response.data and len(response.data) > 0:
+                object_key = response.data[0].get("object_key")
+                if object_key:
+                    minio.delete_file(object_key)
+            
+            # Delete from DB
+            supabase.client.table("documents").delete().eq("id", document_id).execute()
+        except Exception as e:
+            import logging
+            logging.error(f"Failed to delete document from Supabase/MinIO: {e}")
+            
+    # 2. Delete from Qdrant
+    try:
+        from qdrant_client.http import models as qdrant_models
+        # We delete by document_id in payload
+        qdrant.delete(
+            collection_name=settings.qdrant_collection,
+            points_selector=qdrant_models.FilterSelector(
+                filter=qdrant_models.Filter(
+                    must=[
+                        qdrant_models.FieldCondition(
+                            key="document_id",
+                            match=qdrant_models.MatchValue(value=document_id),
+                        )
+                    ]
+                )
+            )
+        )
+    except Exception as e:
+         import logging
+         logging.error(f"Failed to delete document vectors from Qdrant: {e}")
+
+    return {"status": "success", "document_id": document_id}
 
 
 # ---------------------------------------------------------------------------
@@ -246,6 +361,11 @@ async def query_rag(payload: QueryRequest) -> QueryResponse:
             compliance_blocked=True,
             compliance_info=ComplianceInfo(**compliance_result),
         )
+
+    # ---- Step 1.5: Cache Check ----
+    cached_response = RedisHelpers.check_cache(payload.query, payload.model)
+    if cached_response and not payload.session_id: # Only use Exact Match Cache if no history involved, or consider session + query
+        return QueryResponse(**cached_response)
 
     # ---- Step 2: RAG pipeline ----
     with langfuse.trace(
@@ -277,7 +397,7 @@ async def query_rag(payload: QueryRequest) -> QueryResponse:
                 collection_name=settings.qdrant_collection,
                 query=query_vector,
                 query_filter=qdrant_filter,
-                limit=payload.top_k,
+                limit=settings.rerank_top_n, # Retrieve more docs for reranking
                 with_payload=True,
                 with_vectors=False,
             ).points
@@ -296,27 +416,49 @@ async def query_rag(payload: QueryRequest) -> QueryResponse:
                     collection_name=settings.qdrant_collection,
                     query=query_vector,
                     query_filter=legacy_filter,
-                    limit=payload.top_k,
+                    limit=settings.rerank_top_n, # Retrieve more docs for reranking
                     with_payload=True,
                     with_vectors=False,
                 ).points
         except Exception as exc:
             raise HTTPException(status_code=502, detail=str(exc)) from exc
 
+        # ---- Reranking Step ----
+        rerank_docs = []
+        for point in results:
+            payload_data = point.payload or {}
+            text = payload_data.get("text") or payload_data.get("page_content") or ""
+            rerank_docs.append({
+                "id": str(point.id),
+                "text": text,
+                "meta": payload_data,
+                "original_score": float(point.score or 0)
+            })
+
+        ranker = get_ranker()
+        if ranker and rerank_docs:
+            from flashrank import RerankRequest
+            rerankrequest = RerankRequest(query=payload.query, passages=rerank_docs)
+            rerank_results = ranker.rerank(rerankrequest)
+            top_results = rerank_results[:payload.top_k]
+        else:
+            top_results = rerank_docs[:payload.top_k]
+
         context_items: list[dict[str, Any]] = []
         context_texts: list[str] = []
         
-        for point in results:
-            payload_data = point.payload or {}
+        for item in top_results:
+            payload_data = item.get("meta", {})
             legacy_metadata = payload_data.get("metadata") or {}
 
-            text = payload_data.get("text") or payload_data.get("page_content") or ""
+            text = item.get("text") or payload_data.get("page_content") or ""
             document_id = payload_data.get("document_id") or legacy_metadata.get("document_id")
             document_name = payload_data.get("document_name") or legacy_metadata.get("document_name")
             page = payload_data.get("page")
             if page is None:
                 page = legacy_metadata.get("page")
-            score = float(point.score or 0)
+            # flashrank returns new score in 'score', fallback to original
+            score = float(item.get("score", item.get("original_score", 0)))
 
             context_items.append(
                 {
@@ -331,9 +473,16 @@ async def query_rag(payload: QueryRequest) -> QueryResponse:
 
         prompt_store = PromptStore.get()
         context_block = chr(10).join(context_texts)
+        
+        # Load Chat History
+        chat_history = ""
+        if payload.session_id:
+            chat_history = RedisHelpers.get_chat_history(payload.session_id)
+            
         prompt_text = prompt_store.build_rag_prompt(
             context=context_block,
             question=payload.query,
+            chat_history=chat_history
         )
 
         generation_output = None
@@ -356,9 +505,19 @@ async def query_rag(payload: QueryRequest) -> QueryResponse:
             if generation:
                 generation.update(output=generation_output)
 
-    return QueryResponse(
+        # Save to Chat History
+        if payload.session_id and generation_output:
+            RedisHelpers.add_chat_history(payload.session_id, payload.query, generation_output)
+
+    final_response = QueryResponse(
         answer=generation_output or "",
         context=context_items,
         compliance_blocked=False,
         compliance_info=ComplianceInfo(**compliance_result),
     )
+    
+    # Save to Cache (only if no session history involved, to keep caching pure)
+    if not payload.session_id:
+        RedisHelpers.set_cache(payload.query, payload.model, final_response.model_dump(), ttl=settings.cache_ttl)
+
+    return final_response
